@@ -27,6 +27,17 @@ public class BfStockApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
 
+        String cmd = System.getProperty("cmd");
+        log.info("command:{}", cmd);
+
+        if (cmd.equals("claw"))
+            claw();
+
+        if (cmd.equals("all"))
+            StocksTask.all(jdbcTemplate);
+    }
+
+    private void claw() {
         log.info("begin claw");
 
         List<String> stocks = StocksTask.claw(jdbcTemplate);
