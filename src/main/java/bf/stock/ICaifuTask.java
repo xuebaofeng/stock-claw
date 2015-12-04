@@ -1,13 +1,11 @@
 package bf.stock;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -15,7 +13,6 @@ import java.util.List;
  */
 public class ICaifuTask {
 
-    private static final int TIMES = 3;
 
     private static Logger logger = LoggerFactory.getLogger(ICaifuTask.class);
 
@@ -32,7 +29,7 @@ public class ICaifuTask {
                     Integer.class, id);
             if (count == 1) continue;
 
-            Document doc = getDocument(id, TIMES);
+            Document doc = JsoupUtil.getDocument(id, WebserviceType.ICF);
             if (doc == null) {
                 continue;
             }
@@ -71,16 +68,4 @@ public class ICaifuTask {
         }
     }
 
-    private static Document getDocument(String stock, int times) {
-        if (times == -1) return null;
-        Document doc = null;
-        try {
-            doc = Jsoup.connect("http://www.icaifu.com/stock/doctora/" + stock + ".shtml").timeout(Integer.MAX_VALUE).get();
-        } catch (IOException e) {
-            if (times > 0) {
-                return getDocument(stock, --times);
-            }
-        }
-        return doc;
-    }
 }

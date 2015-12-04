@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 public class BfStockApplication implements CommandLineRunner {
 
-    public static final int N_THREADS = 100;
+    public static final int N_THREADS = 20;
     private static final Logger log = LoggerFactory.getLogger(BfStockApplication.class);
     @Autowired
     JdbcTemplate jdbcTemplate;
