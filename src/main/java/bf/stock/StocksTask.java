@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,7 +29,6 @@ public class StocksTask {
         try {
             json = Jsoup.connect(url).ignoreContentType(true).execute().body();
         } catch (IOException e) {
-            e.printStackTrace();
         }
 
         if (json == null) return l;
@@ -48,13 +46,12 @@ public class StocksTask {
     public static List<String> claw(JdbcTemplate jdbcTemplate) {
         List<String> stocks = getAll();
         for (String id : stocks) {
-            Date date = new Date();
-            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=?",
-                    Integer.class, id, date);
+            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date",
+                    Integer.class, id);
             if (count == 0)
                 jdbcTemplate.update("INSERT INTO stock(\n" +
                         "            id, icf_level, tsh_percent, claw_date)\n" +
-                        "    VALUES (?, ?, ?, ?);\n", id, 0, 0, date);
+                        "    VALUES (?, ?, ?, current_date);\n", id, 0, 0);
         }
         return stocks;
     }

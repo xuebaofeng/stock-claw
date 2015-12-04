@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,21 +26,20 @@ public class ICaifuTask {
     }
 
     public static void claw(List<String> stocks, JdbcTemplate jdbcTemplate) {
+
         for (String id : stocks) {
-            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=? and icf_level>0",
-                    Integer.class, id, new Date());
+            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date and icf_level>0",
+                    Integer.class, id);
             if (count == 1) continue;
 
             Document doc = getDocument(id, TIMES);
             if (doc == null) {
-                logger.error("error id:{}", id);
                 continue;
             }
             Elements ele = doc.select("html body div.grid_main div.grid_conten_022 div.grid_conten_2 div.i-nav div.i-nav-02 div.ti-one4 div.ti-biaodan table tbody tr td.g5 span.red");
             String html = ele.html();
             html = html.trim();
 
-            logger.info(html);
             int icf_level;
 
             switch (html) {
@@ -69,25 +67,17 @@ public class ICaifuTask {
             }
 
             logger.info("id:{},icf_level:{}", id, icf_level);
-            jdbcTemplate.update("update stock set icf_level=? where id=? and claw_date=?", icf_level, id, new Date());
+            jdbcTemplate.update("update stock set icf_level=? where id=? and claw_date=current_date", icf_level, id);
         }
     }
 
     private static Document getDocument(String stock, int times) {
-        logger.debug(stock);
         if (times == -1) return null;
         Document doc = null;
         try {
             doc = Jsoup.connect("http://www.icaifu.com/stock/doctora/" + stock + ".shtml").timeout(Integer.MAX_VALUE).get();
         } catch (IOException e) {
-            logger.error(stock);
-            e.printStackTrace();
             if (times > 0) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
                 return getDocument(stock, --times);
             }
         }

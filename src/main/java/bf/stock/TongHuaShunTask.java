@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,7 +15,7 @@ import java.util.List;
  */
 public class TongHuaShunTask {
 
-    private static final int TIMES = 3;
+    private static final int TIMES = 2;
 
     private static Logger logger = LoggerFactory.getLogger(TongHuaShunTask.class);
 
@@ -25,12 +24,11 @@ public class TongHuaShunTask {
 
     }
 
-    public static void claw(List<String> stocks, JdbcTemplate jdbcTemplate) throws Exception {
-
+    public static void claw(List<String> stocks, JdbcTemplate jdbcTemplate) {
         for (String id : stocks) {
 
-            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=? and tsh_percent>0",
-                    Integer.class, id, new Date());
+            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date and tsh_percent>0",
+                    Integer.class, id);
             if (count == 1) continue;
 
 
@@ -51,7 +49,7 @@ public class TongHuaShunTask {
             }
 
             logger.info("id:{},tsh_percent:{}", id, percent);
-            jdbcTemplate.update("update stock set tsh_percent=? where id=? and claw_date=?", percent, id, new Date());
+            jdbcTemplate.update("update stock set tsh_percent=? where id=? and claw_date=current_date", percent, id);
         }
     }
 
@@ -64,13 +62,7 @@ public class TongHuaShunTask {
             logger.debug(url);
             doc = Jsoup.connect(url).timeout(Integer.MAX_VALUE).get();
         } catch (IOException e) {
-            e.printStackTrace();
             if (times > 0) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
                 return getDocument(stock, --times);
             }
         }
