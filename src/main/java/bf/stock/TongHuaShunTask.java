@@ -8,17 +8,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Created by Administrator on 2015/12/1.
  */
 public class TongHuaShunTask {
 
-    private static final int TIMES = 10;
+    private static final int TIMES = 3;
 
     private static Logger logger = LoggerFactory.getLogger(TongHuaShunTask.class);
 
@@ -53,7 +51,7 @@ public class TongHuaShunTask {
             }
 
             logger.info("id:{},tsh_percent:{}", id, percent);
-            jdbcTemplate.update("update id set tsh_percent=? where id=? and claw_date=?", percent, id, new Date());
+            jdbcTemplate.update("update stock set tsh_percent=? where id=? and claw_date=?", percent, id, new Date());
         }
     }
 
@@ -67,7 +65,14 @@ public class TongHuaShunTask {
             doc = Jsoup.connect(url).timeout(Integer.MAX_VALUE).get();
         } catch (IOException e) {
             e.printStackTrace();
-            if (times > 0) return getDocument(stock, --times);
+            if (times > 0) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+                return getDocument(stock, --times);
+            }
         }
         return doc;
     }

@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class ICaifuTask {
 
-    private static final int TIMES = 10;
+    private static final int TIMES = 3;
 
     private static Logger logger = LoggerFactory.getLogger(ICaifuTask.class);
 
@@ -42,7 +42,7 @@ public class ICaifuTask {
             html = html.trim();
 
             logger.info(html);
-            int icf_level = 0;
+            int icf_level;
 
             switch (html) {
                 case "严重低估":
@@ -84,7 +84,7 @@ public class ICaifuTask {
             e.printStackTrace();
             if (times > 0) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
