@@ -3,17 +3,19 @@ package bf.stock;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by Administrator on 2015/12/1.
  */
-public class Stocks {
+public class StocksTask {
 
-    static Logger logger = LoggerFactory.getLogger(Stocks.class);
+    static Logger logger = LoggerFactory.getLogger(StocksTask.class);
 
     public static void main(String[] args) {
 
@@ -43,4 +45,17 @@ public class Stocks {
     }
 
 
+    public static List<String> claw(JdbcTemplate jdbcTemplate) {
+        List<String> stocks = getAll();
+        for (String id : stocks) {
+            Date date = new Date();
+            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=?",
+                    Integer.class, id, date);
+            if (count == 0)
+                jdbcTemplate.update("INSERT INTO stock(\n" +
+                        "            id, icf_level, tsh_percent, claw_date)\n" +
+                        "    VALUES (?, ?, ?, ?);\n", id, 0, 0, date);
+        }
+        return stocks;
+    }
 }
