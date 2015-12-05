@@ -37,6 +37,7 @@ public class StocksTask {
         try {
             json = Jsoup.connect(url).ignoreContentType(true).execute().body();
         } catch (IOException e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
         }
 
@@ -59,7 +60,7 @@ public class StocksTask {
         return s.split("\"")[1].split("\"")[0];
     }
 
-    public static void all(JdbcTemplate jdbcTemplate) {
+    public void all() {
         try {
 
             String url = "http://ctxalgo.com/api/stocks";
@@ -84,6 +85,7 @@ public class StocksTask {
             }
 
         } catch (IOException e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
         }
     }

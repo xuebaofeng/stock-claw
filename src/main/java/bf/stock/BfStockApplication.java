@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 public class BfStockApplication implements CommandLineRunner {
 
-    public static final int N_THREADS = 1;
+    public static final int N_THREADS = 100;
     private static final Logger log = LoggerFactory.getLogger(BfStockApplication.class);
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -35,32 +35,18 @@ public class BfStockApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-
-        String cmd = System.getProperty("cmd");
-        log.info("command:{}", cmd);
-
-        if (cmd.equals("claw"))
-            claw();
-
-        if (cmd.equals("all"))
-            StocksTask.all(jdbcTemplate);
-    }
-
-    private void claw() {
         log.info("begin claw");
 
         List<String> stocks = stocksTask.claw();
-        int size = stocks.size();
-        int step = size / N_THREADS;
 
         ExecutorService executorService = Executors.newFixedThreadPool(N_THREADS);
-        for (int i = 0; i < N_THREADS; i++) {
+        for (int i = 0; i < stocks.size(); i++) {
             final int finalI = i;
-            executorService.submit(() -> iCaifuTask.claw(stocks.subList(finalI * step, finalI * step + step)));
-            executorService.submit(() -> tongHuaShunTask.claw(stocks.subList(finalI * step, finalI * step + step)));
+            executorService.submit(() -> iCaifuTask.claw(stocks.get(finalI)));
+            executorService.submit(() -> tongHuaShunTask.claw(stocks.get(finalI)));
         }
         executorService.shutdown();
-
         log.info("end claw");
     }
+
 }

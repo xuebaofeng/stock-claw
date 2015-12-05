@@ -10,8 +10,11 @@ public class WebServiceTask {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    protected void addErrorCount(String id) {
-        jdbcTemplate.update("update stock_error set error_count=error_count+1 where id=?", id);
+    protected void addErrorCount(String id, WebserviceType type) {
+        if (type == WebserviceType.ICF)
+            jdbcTemplate.update("update stock_error set ec_icf=ec_icf+1 where id=?", id);
+        else if (type == WebserviceType.THS)
+            jdbcTemplate.update("update stock_error set ec_ths=ec_ths+1 where id=?", id);
     }
 
     protected boolean isClosed(String id) {

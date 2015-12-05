@@ -18,18 +18,18 @@ public class JsoupUtil {
     static Document getDocument(String stock, WebserviceType type, int times) {
         if (times == -1) return null;
         Document doc = null;
+        String url = "";
         try {
-            String icfUrl;
             if (type.equals(WebserviceType.ICF))
-                icfUrl = createIcfUrl(stock);
+                url = createIcfUrl(stock);
             else if (type.equals(WebserviceType.THS)) {
-                icfUrl = createTshUrl(stock);
+                url = createTshUrl(stock);
             } else {
                 throw new RuntimeException("Wrong web service type:" + type);
             }
-            doc = Jsoup.connect(icfUrl).timeout(Integer.MAX_VALUE).get();
+            doc = Jsoup.connect(url).timeout(60000).get();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("message:{},url:\n{}", e.getMessage(), url);
             if (times > 0) {
                 return getDocument(stock, type, --times);
             }
