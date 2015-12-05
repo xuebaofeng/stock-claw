@@ -40,5 +40,5 @@ springBoot {
 }
 
 bootRun {
-    jvmArgs = ["-Dcmd=all"]
+    jvmArgs = ["-Dcmd=claw"]
 }

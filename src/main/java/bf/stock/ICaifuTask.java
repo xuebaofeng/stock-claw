@@ -4,30 +4,27 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Created by Administrator on 2015/12/1.
  */
-public class ICaifuTask {
+@Component
+public class ICaifuTask extends WebServiceTask {
 
 
     private static Logger logger = LoggerFactory.getLogger(ICaifuTask.class);
 
 
-    public static void main(String[] args) throws Exception {
-
-
-    }
-
-    public static void claw(List<String> stocks, JdbcTemplate jdbcTemplate) {
+    public void claw(List<String> stocks) {
 
         for (String id : stocks) {
             Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date and icf_level>0",
                     Integer.class, id);
             if (count == 1) continue;
+            if (isClosed(id)) continue;
 
             Document doc = JsoupUtil.getDocument(id, WebserviceType.ICF);
             if (doc == null) {
@@ -55,15 +52,16 @@ public class ICaifuTask {
                 case "严重高估":
                     icf_level = 10;
                     break;
-                case "":
-                    icf_level = 1;
-                    break;
                 default:
-                    icf_level = 99;
+                    icf_level = 0;
                     break;
             }
 
             logger.info("id:{},icf_level:{}", id, icf_level);
+            if (icf_level == 0) {
+                addErrorCount(id);
+                continue;
+            }
             jdbcTemplate.update("update stock set icf_level=? where id=? and claw_date=current_date", icf_level, id);
         }
     }

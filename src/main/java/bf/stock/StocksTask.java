@@ -4,7 +4,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,9 +15,14 @@ import java.util.List;
 /**
  * Created by Administrator on 2015/12/1.
  */
+@Component
 public class StocksTask {
 
     static Logger logger = LoggerFactory.getLogger(StocksTask.class);
+
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     public static void main(String[] args) {
 
@@ -52,20 +59,6 @@ public class StocksTask {
         return s.split("\"")[1].split("\"")[0];
     }
 
-
-    public static List<String> claw(JdbcTemplate jdbcTemplate) {
-        List<String> stocks = allForToday();
-        for (String id : stocks) {
-            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date",
-                    Integer.class, id);
-            if (count == 0)
-                jdbcTemplate.update("INSERT INTO stock(\n" +
-                        "            id, icf_level, tsh_percent, claw_date)\n" +
-                        "    VALUES (?, ?, ?, current_date);\n", id, 0, 0);
-        }
-        return stocks;
-    }
-
     public static void all(JdbcTemplate jdbcTemplate) {
         try {
 
@@ -93,5 +86,18 @@ public class StocksTask {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    public List<String> claw() {
+        List<String> stocks = allForToday();
+        for (String id : stocks) {
+            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date",
+                    Integer.class, id);
+            if (count == 0)
+                jdbcTemplate.update("INSERT INTO stock(\n" +
+                        "            id, icf_level, tsh_percent, claw_date)\n" +
+                        "    VALUES (?, ?, ?, current_date);\n", id, 0, 0);
+        }
+        return stocks;
     }
 }

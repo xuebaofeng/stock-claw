@@ -15,10 +15,19 @@ import java.util.concurrent.Executors;
 @SpringBootApplication
 public class BfStockApplication implements CommandLineRunner {
 
-    public static final int N_THREADS = 20;
+    public static final int N_THREADS = 1;
     private static final Logger log = LoggerFactory.getLogger(BfStockApplication.class);
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    ICaifuTask iCaifuTask;
+
+    @Autowired
+    TongHuaShunTask tongHuaShunTask;
+
+    @Autowired
+    StocksTask stocksTask;
 
     public static void main(String[] args) {
         SpringApplication.run(BfStockApplication.class, args);
@@ -40,15 +49,15 @@ public class BfStockApplication implements CommandLineRunner {
     private void claw() {
         log.info("begin claw");
 
-        List<String> stocks = StocksTask.claw(jdbcTemplate);
+        List<String> stocks = stocksTask.claw();
         int size = stocks.size();
         int step = size / N_THREADS;
 
         ExecutorService executorService = Executors.newFixedThreadPool(N_THREADS);
         for (int i = 0; i < N_THREADS; i++) {
             final int finalI = i;
-            executorService.submit(() -> ICaifuTask.claw(stocks.subList(finalI * step, finalI * step + step), jdbcTemplate));
-            executorService.submit(() -> TongHuaShunTask.claw(stocks.subList(finalI * step, finalI * step + step), jdbcTemplate));
+            executorService.submit(() -> iCaifuTask.claw(stocks.subList(finalI * step, finalI * step + step)));
+            executorService.submit(() -> tongHuaShunTask.claw(stocks.subList(finalI * step, finalI * step + step)));
         }
         executorService.shutdown();
 
