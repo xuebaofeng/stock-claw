@@ -16,7 +16,7 @@ public class StockTaskTests {
 
     @Test
     public void testStockTask() {
-        stocksTask.all();
+        stocksTask.saveBase();
     }
 
 }

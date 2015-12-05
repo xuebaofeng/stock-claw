@@ -1,7 +1,5 @@
 package bf.stock;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +7,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by Administrator on 2015/12/1.
@@ -26,80 +25,45 @@ public class StocksTask {
 
     public static void main(String[] args) {
 
-        logger.debug("list size:{}", allForToday().size());
     }
 
-    public static List<String> allForToday() {
-        List<String> l = new ArrayList<>();
 
-        String url = "http://ctxalgo.com/api/stocks";
-        String json = null;
+    public void saveBase() {
+        jdbcTemplate.update("delete from stock_base");
+
+        Scanner scanner = null;
         try {
-            json = Jsoup.connect(url).ignoreContentType(true).execute().body();
+            scanner = new Scanner(Paths.get("stocks.txt"));
         } catch (IOException e) {
             e.printStackTrace();
-            logger.error(e.getMessage());
         }
+        if (scanner == null) return;
+        scanner.nextLine();
+        while (scanner.hasNext()) {
+            String line = scanner.nextLine();
+            String[] pair = line.split("\t");
+            if (pair.length < 2) continue;
+            String id = pair[0];
 
-        if (json == null) return l;
 
-        json = json.split("\\{")[1].split("\\}")[0];
-        String[] split = json.split(",");
-        for (String s : split) {
-            logger.debug(s);
-            String[] pair = s.split(":");
-            s = removeQuotes(pair[0]);
-            String name = StringEscapeUtils.unescapeJava(removeQuotes(pair[1]));
+            String name = pair[1];
+            String industry = pair[18];
             logger.debug(name);
-            l.add(s);
+            if (id.charAt(0) == '6') id = "sh" + id;
+            else id = "sz" + id;
+
+            int count = jdbcTemplate.queryForObject("select count(id) from stock_base where id=?", Integer.class, id);
+            if (count == 1) continue;
+
+            logger.info("id:{},name:{},industry:{} added", id, name, industry);
+            jdbcTemplate.update("INSERT INTO stock_base(id, name, industry) VALUES (?, ?, ?)", id, name, industry);
         }
-        return l;
+
+
     }
 
-    private static String removeQuotes(String s) {
-        return s.split("\"")[1].split("\"")[0];
-    }
 
-    public void all() {
-        try {
-
-            String url = "http://ctxalgo.com/api/stocks";
-            String json = Jsoup.connect(url).ignoreContentType(true).execute().body();
-
-
-            json = json.split("\\{")[1].split("\\}")[0];
-            String[] split = json.split(",");
-            for (String id : split) {
-                logger.debug(id);
-                String[] pair = id.split(":");
-                id = removeQuotes(pair[0]);
-                String name = StringEscapeUtils.unescapeJava(removeQuotes(pair[1]));
-                logger.debug(name);
-
-                Integer count = jdbcTemplate.queryForObject("select count(id) from stock_base where id=?",
-                        Integer.class, id);
-                if (count == 0)
-                    jdbcTemplate.update("INSERT INTO stock_base(\n" +
-                            "            id, name)\n" +
-                            "    VALUES (?, ?);\n", id, name);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-        }
-    }
-
-    public List<String> claw() {
-        List<String> stocks = allForToday();
-        for (String id : stocks) {
-            Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date",
-                    Integer.class, id);
-            if (count == 0)
-                jdbcTemplate.update("INSERT INTO stock(\n" +
-                        "            id, icf_level, tsh_percent, claw_date)\n" +
-                        "    VALUES (?, ?, ?, current_date);\n", id, 0, 0);
-        }
-        return stocks;
+    public List<String> getAll() {
+        return jdbcTemplate.queryForList("select id from stock_base", String.class);
     }
 }

@@ -35,9 +35,11 @@ public class BfStockApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        log.info("begin claw");
 
-        List<String> stocks = stocksTask.claw();
+//        stocksTask.saveBase();
+
+        log.info("begin claw");
+        List<String> stocks = stocksTask.getAll();
 
         ExecutorService executorService = Executors.newFixedThreadPool(N_THREADS);
         for (int i = 0; i < stocks.size(); i++) {
