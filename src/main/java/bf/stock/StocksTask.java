@@ -29,11 +29,10 @@ public class StocksTask {
 
 
     public void saveBase() {
-        jdbcTemplate.update("delete from stock_base");
 
         Scanner scanner = null;
         try {
-            scanner = new Scanner(Paths.get("stocks.txt"));
+            scanner = new Scanner(Paths.get("db-tdx.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,7 +62,13 @@ public class StocksTask {
     }
 
 
-    public List<String> getAll() {
-        return jdbcTemplate.queryForList("select id from stock_base", String.class);
+    public void populate() {
+        List<String> stocks = jdbcTemplate.queryForList("select id from stock_base", String.class);
+        for (String id : stocks) {
+            int count = jdbcTemplate.queryForObject("select count(id) from stock where id=?", Integer.class, id);
+            if (count == 1) continue;
+            jdbcTemplate.update("INSERT INTO stock(id) VALUES (?)", id);
+        }
+
     }
 }

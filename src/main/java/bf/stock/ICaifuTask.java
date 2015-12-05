@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2015/12/1.
  */
@@ -17,11 +19,6 @@ public class ICaifuTask extends WebServiceTask {
 
 
     public void claw(String id) {
-
-        Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date and icf_level>0",
-                Integer.class, id);
-        if (count == 1) return;
-        if (isClosed(id)) return;
 
         Document doc = JsoupUtil.getDocument(id, WebserviceType.ICF);
         if (doc == null) {
@@ -63,4 +60,7 @@ public class ICaifuTask extends WebServiceTask {
         jdbcTemplate.update("update stock set icf_level=? where id=? and claw_date=current_date", icf_level, id);
     }
 
+    public List<String> tasks() {
+        return jdbcTemplate.queryForList("select id from stock where claw_date=current_date and icf_level=0", String.class);
+    }
 }

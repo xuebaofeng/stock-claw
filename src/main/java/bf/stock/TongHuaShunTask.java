@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2015/12/1.
  */
@@ -23,10 +25,6 @@ public class TongHuaShunTask extends WebServiceTask {
 
     public void claw(String id) {
 
-        Integer count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date and tsh_percent>0",
-                Integer.class, id);
-        if (count == 1) return;
-        if (isClosed(id)) return;
 
         Document doc = JsoupUtil.getDocument(id, WebserviceType.THS);
         if (doc == null) {
@@ -52,4 +50,8 @@ public class TongHuaShunTask extends WebServiceTask {
         jdbcTemplate.update("update stock set tsh_percent=? where id=? and claw_date=current_date", percent, id);
     }
 
+    public List<String> tasks() {
+        return jdbcTemplate.queryForList("select id from stock " +
+                "where claw_date=current_date and tsh_percent=0 and id<>'sz300033'", String.class);
+    }
 }

@@ -37,16 +37,22 @@ public class BfStockApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
 
 //        stocksTask.saveBase();
+        stocksTask.populate();
 
         log.info("begin claw");
-        List<String> stocks = stocksTask.getAll();
 
         ExecutorService executorService = Executors.newFixedThreadPool(N_THREADS);
-        for (int i = 0; i < stocks.size(); i++) {
-            final int finalI = i;
-            executorService.submit(() -> iCaifuTask.claw(stocks.get(finalI)));
-            executorService.submit(() -> tongHuaShunTask.claw(stocks.get(finalI)));
+
+        List<String> tasks = iCaifuTask.tasks();
+        for (String task : tasks) {
+            executorService.submit(() -> iCaifuTask.claw(task));
         }
+
+        tasks = tongHuaShunTask.tasks();
+        for (String task : tasks) {
+            executorService.submit(() -> tongHuaShunTask.claw(task));
+        }
+
         executorService.shutdown();
         log.info("end claw");
     }

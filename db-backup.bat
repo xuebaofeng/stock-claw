@@ -1,1 +1,1 @@
-C:/Program Files/PostgreSQL/9.4/bin/pg_dump.exe --host localhost --port 5432 --username "postgres" --no-password  --format plain --no-owner --encoding UTF8 --inserts --no-privileges --no-tablespaces --no-unlogged-table-data --file "D:\github\stock-claw\stock.backup.sql" "stock"
+"C:/Program Files/PostgreSQL/9.4/bin/pg_dump.exe" --host localhost --port 5432 --username "postgres" --no-password  --format plain --no-owner --encoding UTF8 --inserts --no-privileges --no-tablespaces --no-unlogged-table-data --file "D:\github\stock-claw\db-backup.sql" "stock"
