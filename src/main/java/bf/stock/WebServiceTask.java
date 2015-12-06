@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * Created by Administrator on 2015/12/4.
  */
-public class WebServiceTask {
+public abstract class WebServiceTask {
     @Autowired
     JdbcTemplate jdbcTemplate;
 

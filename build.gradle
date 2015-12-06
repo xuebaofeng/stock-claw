@@ -35,7 +35,7 @@ dependencies {
 
     runtime('org.postgresql:postgresql:9.4-1201-jdbc41')
     testCompile('org.springframework.boot:spring-boot-starter-test',
-            'com.alibaba:druid:1.0.16'
+            'com.jolbox:bonecp:0.8.0.RELEASE'
     )
 }
 
