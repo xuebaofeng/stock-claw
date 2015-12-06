@@ -7,11 +7,11 @@ select * from stock_base
 select *,
 'http://www.icaifu.com/stock/doctora/' || s.id || '.shtml' 
 from stock s join stock_base b on s.id=b.id 
-where icf_level=50 and tsh_percent>=90  and claw_date=current_date
+where icf_level=50 and ths_percent>=90  and claw_date=current_date
 order by b.industry;
 
 
-select * from stock where tsh_percent=0 and icf_level=0 and claw_date=current_date and id not in(select id from stock_closed);
+select * from stock where ths_percent=0 and icf_level=0 and claw_date=current_date and id not in(select id from stock_closed);
 
 --delete  from stock where claw_date=current_date
 
@@ -29,7 +29,7 @@ order by ec_icf+ec_ths desc;
 
 select count(*) from stock where icf_level=0 and  claw_date=current_date;
 
-select * from stock where tsh_percent=0 and  claw_date=current_date;
+select * from stock where ths_percent=0 and  claw_date=current_date;
 
 select * from stock_closed order by id ;
 

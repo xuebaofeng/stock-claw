@@ -3,9 +3,6 @@ package bf.stock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -17,24 +14,14 @@ import java.util.Scanner;
 /**
  * Created by Administrator on 2015/12/1.
  */
-@SpringBootApplication
 @Component
-public class StocksTask implements CommandLineRunner {
+public class StocksTask {
 
     static Logger logger = LoggerFactory.getLogger(StocksTask.class);
 
 
     @Autowired
     JdbcTemplate jdbcTemplate;
-
-    public static void main(String[] args) {
-        SpringApplication.run(StocksTask.class, args);
-    }
-
-    @Override
-    public void run(String... strings) throws Exception {
-        saveBase();
-    }
 
 
     public void saveBase() {
@@ -75,9 +62,10 @@ public class StocksTask implements CommandLineRunner {
 
 
     public void populate() {
+        logger.info("populate stock table for current day");
         List<String> stocks = jdbcTemplate.queryForList("select id from stock_base", String.class);
         for (String id : stocks) {
-            int count = jdbcTemplate.queryForObject("select count(id) from stock where id=?", Integer.class, id);
+            int count = jdbcTemplate.queryForObject("select count(id) from stock where id=? and claw_date=current_date", Integer.class, id);
             if (count == 1) continue;
             jdbcTemplate.update("INSERT INTO stock(id) VALUES (?)", id);
         }

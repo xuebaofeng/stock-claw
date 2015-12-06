@@ -42,16 +42,16 @@ public class TongHuaShunTask extends WebServiceTask {
             logger.error("error html:{},e:{}", html, e.getMessage());
         }
 
-        logger.info("id:{},tsh_percent:{}", id, percent);
+        logger.info("id:{},ths_percent:{}", id, percent);
         if (percent == 0) {
             addErrorCount(id, WebserviceType.THS);
             return;
         }
-        jdbcTemplate.update("update stock set tsh_percent=? where id=? and claw_date=current_date", percent, id);
+        jdbcTemplate.update("update stock set ths_percent=? where id=? and claw_date=current_date", percent, id);
     }
 
     public List<String> tasks() {
         return jdbcTemplate.queryForList("select id from stock " +
-                "where claw_date=current_date and tsh_percent=0 and id<>'sz300033'", String.class);
+                "where claw_date=current_date and ths_percent=0 and id<>'sz300033'", String.class);
     }
 }

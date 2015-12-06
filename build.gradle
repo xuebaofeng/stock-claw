@@ -40,8 +40,10 @@ dependencies {
 }
 
 springBoot {
-//    mainClass = "bf.stock.Application"
-    mainClass = "bf.stock.StocksTask"
+    mainClass = "bf.stock.Application"
 }
 
 defaultTasks 'bootRun'
+bootRun {
+    systemProperties['java.util.concurrent.ForkJoinPool.common.parallelism'] = '100'
+}
