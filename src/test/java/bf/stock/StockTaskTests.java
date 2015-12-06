@@ -1,21 +1,20 @@
 package bf.stock;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import com.alibaba.druid.pool.DruidDataSource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = BfStockApplication.class)
 public class StockTaskTests {
 
-    @Autowired
-    StocksTask stocksTask;
 
-
-    @Test
-    public void testStockTask() {
+    public static void main(String[] args) {
+        DruidDataSource dataSource = new DruidDataSource();
+        dataSource.setDriverClassName("org.postgresql.Driver");
+        dataSource.setUrl("jdbc:postgresql://localhost/stock");
+        dataSource.setUsername("postgres");
+        dataSource.setPassword("123456");
+        dataSource.setInitialSize(8);
+        StocksTask stocksTask = new StocksTask();
+        stocksTask.jdbcTemplate = new JdbcTemplate(dataSource);
         stocksTask.saveBase();
     }
 

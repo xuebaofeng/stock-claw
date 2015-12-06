@@ -3,6 +3,9 @@ package bf.stock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +17,9 @@ import java.util.Scanner;
 /**
  * Created by Administrator on 2015/12/1.
  */
+@SpringBootApplication
 @Component
-public class StocksTask {
+public class StocksTask implements CommandLineRunner {
 
     static Logger logger = LoggerFactory.getLogger(StocksTask.class);
 
@@ -24,12 +28,17 @@ public class StocksTask {
     JdbcTemplate jdbcTemplate;
 
     public static void main(String[] args) {
+        SpringApplication.run(StocksTask.class, args);
+    }
 
+    @Override
+    public void run(String... strings) throws Exception {
+        saveBase();
     }
 
 
     public void saveBase() {
-
+        logger.info("begin to import tdx data");
         Scanner scanner = null;
         try {
             scanner = new Scanner(Paths.get("db-tdx.txt"));
@@ -52,7 +61,10 @@ public class StocksTask {
             else id = "sz" + id;
 
             int count = jdbcTemplate.queryForObject("select count(id) from stock_base where id=?", Integer.class, id);
-            if (count == 1) continue;
+            if (count == 1) {
+                logger.info("id:{} exist, skip adding", id);
+                continue;
+            }
 
             logger.info("id:{},name:{},industry:{} added", id, name, industry);
             jdbcTemplate.update("INSERT INTO stock_base(id, name, industry) VALUES (?, ?, ?)", id, name, industry);

@@ -13,6 +13,8 @@ order by b.industry;
 
 select * from stock where tsh_percent=0 and icf_level=0 and claw_date=current_date and id not in(select id from stock_closed);
 
+--delete  from stock where claw_date=current_date
+
 
 
 --INSERT INTO stock_closed(id)VALUES ('sz000787');
@@ -31,6 +33,3 @@ select * from stock where tsh_percent=0 and  claw_date=current_date;
 
 select * from stock_closed order by id ;
 
-
-select * from stock where claw_date=current_date and id='sz002317' and id <>'sz300033'
---delete  from stock where claw_date=current_date

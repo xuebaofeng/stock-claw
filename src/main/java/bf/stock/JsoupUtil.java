@@ -12,7 +12,7 @@ import java.io.IOException;
  * Created by Baofeng(Shawn) Xue on 12/4/15.
  */
 public class JsoupUtil {
-    public static final int TIMES = 3;
+    public static final int TIMES = 1;
     private static Logger logger = LoggerFactory.getLogger(JsoupUtil.class);
 
     static Document getDocument(String stock, WebserviceType type, int times) {

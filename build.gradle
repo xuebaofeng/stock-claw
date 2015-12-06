@@ -6,13 +6,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}") 
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
-apply plugin: 'spring-boot' 
+apply plugin: 'spring-boot'
 
 jar {
     baseName = 'bf-stock'
@@ -29,12 +29,19 @@ repositories {
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-jdbc',
             'org.jsoup:jsoup:latest.integration',
-            'org.apache.commons:commons-lang3:3.4')
+            'org.apache.commons:commons-lang3:3.4',
+
+    )
 
     runtime('org.postgresql:postgresql:9.4-1201-jdbc41')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.boot:spring-boot-starter-test',
+            'com.alibaba:druid:1.0.16'
+    )
 }
 
 springBoot {
-    mainClass = "bf.stock.BfStockApplication"
+//    mainClass = "bf.stock.Application"
+    mainClass = "bf.stock.StocksTask"
 }
+
+defaultTasks 'bootRun'
