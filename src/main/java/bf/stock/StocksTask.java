@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class StocksTask {
 
-    static Logger logger = LoggerFactory.getLogger(StocksTask.class);
+    private static Logger logger = LoggerFactory.getLogger(StocksTask.class);
 
 
     @Autowired
