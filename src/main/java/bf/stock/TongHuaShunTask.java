@@ -4,10 +4,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,11 +21,7 @@ public class TongHuaShunTask extends WebServiceTask {
     private static Logger logger = LoggerFactory.getLogger(TongHuaShunTask.class);
 
 
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
     public void claw(String id) {
-
 
         Document doc = JsoupUtil.getDocument(id, WebserviceType.THS);
         if (doc == null) {
@@ -47,11 +44,46 @@ public class TongHuaShunTask extends WebServiceTask {
             addErrorCount(id, WebserviceType.THS);
             return;
         }
-        jdbcTemplate.update("update stock set ths_percent=? where id=? and claw_date=current_date", percent, id);
+        ele = doc.select("span.date");
+        Date date = parseDate(ele.html());
+
+        if (isExist(id, date)) return;
+        jdbcTemplate.update("insert into stock(id,claw_date,ths_percent) values(?,?,?)", id, date, percent);
+    }
+
+    private Date parseDate(String html) {
+        html = html.split(":")[1].split(" ")[0];
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < html.length(); i++) {
+            char c = html.charAt(i);
+            if (c >= '0' && c <= '9') sb.append(c);
+        }
+
+        SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd");
+        Date date = null;
+        try {
+            date = f.parse(sb.toString());
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
+        }
+        return date;
     }
 
     public List<String> tasks() {
-        return jdbcTemplate.queryForList("select id from stock " +
-                "where claw_date=current_date and ths_percent=0 and id<>'sz300033'", String.class);
+        List<String> stocks = jdbcTemplate.queryForList("select id from stock_base where id<>'sz300033' " +
+                "and id not in(select id from stock where claw_date=?)", String.class, getMaxDate());
+        logger.info("tonghuashun task size:{}", stocks.size());
+        return stocks;
+    }
+
+    public List<String> tasks() {
+        List<String> stocks = jdbcTemplate.queryForList("select id from stock_base where id<>'sz300033' " +
+                "and id not in(select id from stock where claw_date=?)", String.class, getMaxDate());
+        logger.info("tonghuashun task size:{}", stocks.size());
+        return stocks;
+    }
+
+    public static void main(String[] args) {
     }
 }

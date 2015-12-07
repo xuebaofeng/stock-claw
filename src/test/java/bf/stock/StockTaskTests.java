@@ -19,8 +19,6 @@ public class StockTaskTests {
 
     public static void main(String[] args) throws IOException {
 
-        StocksTask stocksTask = new StocksTask();
-        stocksTask.jdbcTemplate = newJdbcTempate();
         logger.info("begin to import tdx data");
         String fileName = "db-tdx.txt";
 
@@ -28,6 +26,7 @@ public class StockTaskTests {
         stocks.remove(0);
         stocks.remove(stocks.size() - 1);
 
+        JdbcTemplate jdbcTemplate = newJdbcTemplate();
         stocks.parallelStream()
                 .forEach((line) -> {
                     String[] pair = line.split("\t");
@@ -39,7 +38,7 @@ public class StockTaskTests {
 
                     if (id.length() != 8) return;
 
-                    int count = stocksTask.jdbcTemplate.queryForObject("select count(id) from stock_base where id=?",
+                    int count = jdbcTemplate.queryForObject("select count(id) from stock_base where id=?",
                             Integer.class, id);
                     if (count == 1) {
                         logger.info("id:{} exist, skip adding", id);
@@ -47,13 +46,13 @@ public class StockTaskTests {
                     }
 
                     logger.info("id:{},name:{},industry:{} added", id, name, industry);
-                    stocksTask.jdbcTemplate.update("INSERT INTO stock_base(id, name, industry) VALUES (?, ?, ?)", id, name, industry);
+                    jdbcTemplate.update("INSERT INTO stock_base(id, name, industry) VALUES (?, ?, ?)", id, name, industry);
                 });
 
 
     }
 
-    private static JdbcTemplate newJdbcTempate() {
+    private static JdbcTemplate newJdbcTemplate() {
         BoneCPConfig config = new BoneCPConfig();
         config.setJdbcUrl("jdbc:postgresql://localhost/stock");
         config.setPartitionCount(8);

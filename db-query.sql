@@ -1,17 +1,19 @@
 ﻿--delete from stock_base
 select * from stock_base
- where id='sz002317'
+ where id='sz代码';
+
+delete from stock_base  where id='sz代码';
+
 --INSERT INTO stock_base(id, name, industry) VALUES ('', '', '')
 
 
-select *,
-'http://www.icaifu.com/stock/doctora/' || s.id || '.shtml' 
+select *
 from stock s join stock_base b on s.id=b.id 
 where icf_level=50 and ths_percent>=90  and claw_date=current_date
 order by b.industry;
 
 
-select * from stock where ths_percent=0 and icf_level=0 and claw_date=current_date and id not in(select id from stock_closed);
+--and id not in(select id from stock_closed);
 
 --delete  from stock where claw_date=current_date
 
@@ -27,9 +29,7 @@ order by ec_icf+ec_ths desc;
 --update stock set icf_level=0 where icf_level=99
 
 
-select count(*) from stock where icf_level=0 and  claw_date=current_date;
+select count(*) from stock where icf_level=0 and  claw_date=current_date +1;
 
-select * from stock where ths_percent=0 and  claw_date=current_date;
 
-select * from stock_closed order by id ;
-
+--select * from stock_closed order by id ;

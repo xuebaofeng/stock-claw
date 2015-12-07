@@ -18,8 +18,6 @@ public class Application implements CommandLineRunner {
     @Autowired
     TongHuaShunTask tongHuaShunTask;
 
-    @Autowired
-    StocksTask stocksTask;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -30,9 +28,9 @@ public class Application implements CommandLineRunner {
 
         log.info("begin claw");
 
-        stocksTask.populate();
+//        tongHuaShunTask.tasks().parallelStream().forEach(tongHuaShunTask::claw);
         iCaifuTask.tasks().parallelStream().forEach(iCaifuTask::claw);
-        tongHuaShunTask.tasks().parallelStream().forEach(tongHuaShunTask::claw);
+
 
         log.info("end claw");
     }

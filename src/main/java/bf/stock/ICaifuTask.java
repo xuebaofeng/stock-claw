@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,10 +58,16 @@ public class ICaifuTask extends WebServiceTask {
             addErrorCount(id, WebserviceType.ICF);
             return;
         }
-        jdbcTemplate.update("update stock set icf_level=? where id=? and claw_date=current_date", icf_level, id);
+        Date date = getMaxDate();
+        jdbcTemplate.update("update stock set icf_level=? where id=? and claw_date=?", icf_level, id, date);
     }
 
     public List<String> tasks() {
-        return jdbcTemplate.queryForList("select id from stock where claw_date=current_date and icf_level=0", String.class);
+
+        Date date = getMaxDate();
+        List<String> stocks = jdbcTemplate.queryForList("select id from stock where claw_date=? and icf_level=0", String.class, date);
+        logger.info("icaifu task size:{}", stocks.size());
+        return stocks;
     }
+
 }
