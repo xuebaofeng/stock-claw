@@ -20,6 +20,8 @@ public class TongHuaShunTask extends WebServiceTask {
 
     private static Logger logger = LoggerFactory.getLogger(TongHuaShunTask.class);
 
+    public static void main(String[] args) {
+    }
 
     public void claw(String id) {
 
@@ -75,15 +77,5 @@ public class TongHuaShunTask extends WebServiceTask {
                 "and id not in(select id from stock where claw_date=?)", String.class, getMaxDate());
         logger.info("tonghuashun task size:{}", stocks.size());
         return stocks;
-    }
-
-    public List<String> tasks() {
-        List<String> stocks = jdbcTemplate.queryForList("select id from stock_base where id<>'sz300033' " +
-                "and id not in(select id from stock where claw_date=?)", String.class, getMaxDate());
-        logger.info("tonghuashun task size:{}", stocks.size());
-        return stocks;
-    }
-
-    public static void main(String[] args) {
     }
 }

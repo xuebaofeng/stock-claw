@@ -28,7 +28,7 @@ public class Application implements CommandLineRunner {
 
         log.info("begin claw");
 
-//        tongHuaShunTask.tasks().parallelStream().forEach(tongHuaShunTask::claw);
+        tongHuaShunTask.tasks().parallelStream().forEach(tongHuaShunTask::claw);
         iCaifuTask.tasks().parallelStream().forEach(iCaifuTask::claw);
 
 
