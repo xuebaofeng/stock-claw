@@ -49,8 +49,8 @@ public class TongHuaShunTask extends WebServiceTask {
         ele = doc.select("span.date");
         Date date = parseDate(ele.html());
 
-        if (isExist(id, date)) return;
-        jdbcTemplate.update("insert into stock(id,claw_date,ths_percent) values(?,?,?)", id, date, percent);
+        int update = jdbcTemplate.update("update stock set ths_date=?, ths_percent=? where id=? and c_date=current_date", date, percent, id);
+        if (update != 1) throw new RuntimeException("tsh update failed");
     }
 
     private Date parseDate(String html) {
@@ -73,8 +73,7 @@ public class TongHuaShunTask extends WebServiceTask {
     }
 
     public List<String> tasks() {
-        List<String> stocks = jdbcTemplate.queryForList("select id from stock_base where id<>'sz300033' " +
-                "and id not in(select id from stock where claw_date=?)", String.class, getMaxDate());
+        List<String> stocks = jdbcTemplate.queryForList("select id from stock where id<>'sz300033' and c_date=current_date and ths_percent=0", String.class);
         logger.info("tonghuashun task size:{}", stocks.size());
         return stocks;
     }
