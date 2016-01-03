@@ -17,6 +17,10 @@ public class ICaifuTask extends WebServiceTask {
 
     private static Logger logger = LoggerFactory.getLogger(ICaifuTask.class);
 
+    public static void main(String[] args) {
+        ICaifuTask main = new ICaifuTask();
+        main.claw("sz000002");
+    }
 
     public void claw(String id) {
 
@@ -25,11 +29,12 @@ public class ICaifuTask extends WebServiceTask {
             addErrorCount(id, WebserviceType.ICF);
             return;
         }
+
+        int icf_level = 0;
+
         Elements ele = doc.select("html body div.grid_main div.grid_conten_022 div.grid_conten_2 div.i-nav div.i-nav-02 div.ti-one4 div.ti-biaodan table tbody tr td.g5 span.red");
         String html = ele.html();
         html = html.trim();
-
-        int icf_level;
 
         switch (html) {
             case "严重低估":
@@ -46,10 +51,11 @@ public class ICaifuTask extends WebServiceTask {
                 break;
             case "严重高估":
                 icf_level = 10;
-                break;
-            default:
-                icf_level = 0;
-                break;
+        }
+
+        ele = doc.select(".picL_top");
+        if (ele.html().contains("--")) {
+            icf_level = 1;
         }
 
         logger.info("id:{},icf_level:{}", id, icf_level);

@@ -45,5 +45,5 @@ springBoot {
 
 defaultTasks 'bootRun'
 bootRun {
-    systemProperties['java.util.concurrent.ForkJoinPool.common.parallelism'] = '50'
+    systemProperties['java.util.concurrent.ForkJoinPool.common.parallelism'] = '64'
 }

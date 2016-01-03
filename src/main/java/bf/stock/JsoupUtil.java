@@ -12,7 +12,7 @@ import java.io.IOException;
  * Created by Baofeng(Shawn) Xue on 12/4/15.
  */
 public class JsoupUtil {
-    public static final int TIMES = 1;
+    public static final int TIMES = 5;
     private static Logger logger = LoggerFactory.getLogger(JsoupUtil.class);
 
     static Document getDocument(String stock, WebserviceType type, int times) {
@@ -27,7 +27,7 @@ public class JsoupUtil {
             } else {
                 throw new RuntimeException("Wrong web service type:" + type);
             }
-            doc = Jsoup.connect(url).timeout(60000).get();
+            doc = Jsoup.connect(url).timeout(100000).get();
         } catch (IOException e) {
             logger.error("message:{},url:\n{}", e.getMessage(), url);
             if (times > 0) {

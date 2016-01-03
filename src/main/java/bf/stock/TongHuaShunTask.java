@@ -21,6 +21,8 @@ public class TongHuaShunTask extends WebServiceTask {
     private static Logger logger = LoggerFactory.getLogger(TongHuaShunTask.class);
 
     public static void main(String[] args) {
+        TongHuaShunTask main = new TongHuaShunTask();
+        main.claw("000929");
     }
 
     public void claw(String id) {
@@ -30,12 +32,12 @@ public class TongHuaShunTask extends WebServiceTask {
             addErrorCount(id, WebserviceType.THS);
             return;
         }
-        Elements ele = doc.select("#nav_basic.box2.indexStat div.box2wrap.basic_score div.result p span.gray");
+        Elements ele = doc.select(".stocktotal");//综合诊断：6.2分 打败了93%的股票！
         String html = ele.html();
         if (html.length() == 0) return;
         int percent = 0;
         try {
-            html = html.substring(6).split("%")[0];
+            html = html.split("%")[0].split(" ")[1].substring(3);
             percent = Integer.parseInt(html);
         } catch (Exception e) {
             logger.error("error html:{},e:{}", html, e.getMessage());
