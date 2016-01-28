@@ -6,11 +6,17 @@ delete from stock_base  where id='sz代码';
 
 --INSERT INTO stock_base(id, name, industry) VALUES ('', '', '')
 
+select max(c_date) from stock;
 
 select *
 from stock s join stock_base b on s.id=b.id 
-where icf_level=50 and ths_percent>=90  and c_date=current_date
+where icf_level=4 and c_date=current_date and s.ths_percent>90
 order by b.industry;
+
+update stock set ths_percent=0
+where c_date=current_date;
+
+select * from stock where c_date=current_date and icf_level>=40;
 
 
 --and id not in(select id from stock_closed);
