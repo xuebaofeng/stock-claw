@@ -13,14 +13,10 @@ public class Application implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     @Autowired
-    ICaifuTask iCaifuTask;
-
-    @Autowired
     TongHuaShunTask tongHuaShunTask;
 
     @Autowired
     StockBaseTask stockBaseTask;
-
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -31,12 +27,9 @@ public class Application implements CommandLineRunner {
 
         log.info("begin claw");
 
-
         stockBaseTask.populate();
 
         tongHuaShunTask.tasks().parallelStream().forEach(tongHuaShunTask::claw);
-        iCaifuTask.tasks().parallelStream().forEach(iCaifuTask::claw);
-
 
         log.info("end claw");
     }

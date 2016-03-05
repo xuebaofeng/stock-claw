@@ -10,6 +10,8 @@ import java.util.List;
 
 /**
  * Created by Administrator on 2015/12/1.
+ * 财富数据不准确
+ * @deprecated
  */
 @Component
 public class ICaifuTask extends WebServiceTask {
